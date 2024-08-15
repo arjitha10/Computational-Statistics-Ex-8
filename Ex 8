@@ -1,0 +1,55 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Step 1: Generate or Load Data
+# Here, we'll create a synthetic 2D dataset for simplicity.
+np.random.seed(42)
+mean = [0, 0]
+cov = [[1, 0.9], [0.9, 1]]  # Covariance matrix
+data = np.random.multivariate_normal(mean, cov, 100)
+df = pd.DataFrame(data, columns=['Feature1', 'Feature2'])
+
+# Step 2: Standardize the Data
+# Standardizing ensures that each feature has a mean of 0 and a variance of 1.
+standardized_data = (df - df.mean()) / df.std()
+
+# Step 3: Calculate the Covariance Matrix
+cov_matrix = np.cov(standardized_data.T)
+print("Covariance Matrix:\n", cov_matrix)
+
+# Step 4: Calculate the Eigenvalues and Eigenvectors
+eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
+print("\nEigenvalues:\n", eigenvalues)
+print("\nEigenvectors:\n", eigenvectors)
+
+# Step 5: Sort Eigenvalues and Eigenvectors
+# Sort the eigenvalues in descending order and sort the eigenvectors accordingly
+sorted_indices = np.argsort(eigenvalues)[::-1]
+sorted_eigenvalues = eigenvalues[sorted_indices]
+sorted_eigenvectors = eigenvectors[:, sorted_indices]
+
+print("\nSorted Eigenvalues:\n", sorted_eigenvalues)
+print("\nSorted Eigenvectors:\n", sorted_eigenvectors)
+
+# Step 6: Select Principal Components
+# We will select the top k eigenvectors (k=1 for this example) to reduce dimensionality
+k = 1
+selected_eigenvectors = sorted_eigenvectors[:, :k]
+
+print(f"\nSelected Eigenvectors (Top {k}):\n", selected_eigenvectors)
+
+# Step 7: Transform the Data
+# Project the data onto the selected eigenvectors
+transformed_data = standardized_data.dot(selected_eigenvectors)
+print("\nTransformed Data:\n", transformed_data)
+
+# Step 8: Visualization (Optional)
+plt.figure(figsize=(10, 5))
+plt.scatter(transformed_data, np.zeros_like(transformed_data), alpha=0.7, color='blue', label='Principal Component 1')
+plt.title('PCA Result')
+plt.xlabel('Principal Component 1')
+plt.ylabel('Zero (for 1D projection)')
+plt.legend()
+plt.grid(True)
+plt.show()
